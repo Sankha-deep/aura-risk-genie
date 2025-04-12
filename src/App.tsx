@@ -1,5 +1,4 @@
 
-import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -10,6 +9,9 @@ import AppLayout from "./components/layout/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import Assessment from "./pages/Assessment";
 import Reports from "./pages/Reports";
+import Analytics from "./pages/Analytics";
+import AiAssistant from "./pages/AiAssistant";
+import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient();
 
@@ -33,17 +35,17 @@ const App = () => (
           } />
           <Route path="/analytics" element={
             <AppLayout>
-              <Dashboard />
+              <Analytics />
             </AppLayout>
           } />
           <Route path="/assistant" element={
             <AppLayout>
-              <Dashboard />
+              <AiAssistant />
             </AppLayout>
           } />
           <Route path="/settings" element={
             <AppLayout>
-              <Dashboard />
+              <Settings />
             </AppLayout>
           } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

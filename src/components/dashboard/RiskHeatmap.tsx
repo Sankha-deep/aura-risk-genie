@@ -1,20 +1,34 @@
 
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { RiskDataService } from "@/lib/data/riskDataService";
+import { toast } from "sonner";
 
 const impactLabels = ["Negligible", "Minor", "Moderate", "Major", "Severe"];
 const likelihoodLabels = ["Rare", "Unlikely", "Possible", "Likely", "Almost Certain"];
 
-// Mock data for the heatmap - each cell contains the number of risks in that category
-const heatmapData = [
-  [1, 0, 0, 0, 2], // Rare row
-  [0, 1, 2, 3, 1], // Unlikely row
-  [0, 2, 4, 2, 2], // Possible row
-  [1, 2, 3, 3, 1], // Likely row
-  [0, 0, 2, 1, 3], // Almost Certain row
-];
-
 const RiskHeatmap = () => {
+  const [loading, setLoading] = useState<boolean>(true);
+  const [heatmapData, setHeatmapData] = useState<number[][]>([]);
+
+  useEffect(() => {
+    const loadHeatmapData = async () => {
+      try {
+        setLoading(true);
+        const data = await RiskDataService.getRiskHeatmapData();
+        setHeatmapData(data);
+      } catch (error) {
+        console.error("Error loading heatmap data:", error);
+        toast.error("Failed to load risk heatmap data");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadHeatmapData();
+  }, []);
+
   const getCellColor = (likelihood: number, impact: number) => {
     // Calculate risk score (1-25)
     const score = (likelihood + 1) * (impact + 1);
@@ -25,6 +39,22 @@ const RiskHeatmap = () => {
     if (score <= 19) return "bg-yellow-200 text-yellow-800";
     return "bg-red-200 text-red-800"; // High risk
   };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Risk Heatmap</CardTitle>
+          <CardDescription>Loading heatmap data...</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[200px] flex items-center justify-center">
+            <div className="animate-pulse text-primary">Loading...</div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -51,7 +81,7 @@ const RiskHeatmap = () => {
               {likelihoodLabels.map((rowLabel, rowIndex) => (
                 <tr key={rowIndex}>
                   <td className="border p-1 text-xs text-muted-foreground">{rowLabel}</td>
-                  {heatmapData[rowIndex].map((count, colIndex) => (
+                  {heatmapData[rowIndex]?.map((count, colIndex) => (
                     <td
                       key={colIndex}
                       className={cn(
@@ -61,6 +91,8 @@ const RiskHeatmap = () => {
                     >
                       {count}
                     </td>
+                  )) || Array(5).fill(0).map((_, i) => (
+                    <td key={i} className="border p-3 text-center text-sm">0</td>
                   ))}
                 </tr>
               ))}
