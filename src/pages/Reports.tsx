@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,8 @@ import { FileText, Download, Search, Filter, CalendarIcon, ChevronDown, BarChart
 import { toast } from "sonner";
 import ReportRiskCategoriesChart from "@/components/reports/ReportRiskCategoriesChart";
 import ReportRiskTrendChart from "@/components/reports/ReportRiskTrendChart";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 const reportData = [
   {
@@ -142,6 +144,12 @@ const Reports = () => {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
 
+  const navigate = useNavigate();
+
+  const handleBackToDashboard = () => {
+    navigate('/');
+  };
+
   const filteredReports = reportData.filter(report => 
     report.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     report.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -167,11 +175,21 @@ const Reports = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Reports</h1>
-        <p className="text-muted-foreground mt-2">
-          Access your risk analysis reports and insights
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Reports</h1>
+          <p className="text-muted-foreground mt-2">
+            Access your risk analysis reports and insights
+          </p>
+        </div>
+        <Button 
+          variant="outline" 
+          onClick={handleBackToDashboard}
+          className="gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Dashboard
+        </Button>
       </div>
 
       <Tabs defaultValue="published" className="space-y-4">
