@@ -8,7 +8,8 @@ import {
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  Legend, 
+  Legend,
+  Cell,
   ResponsiveContainer 
 } from "recharts";
 import { RiskDataService } from "@/lib/data/riskDataService";
