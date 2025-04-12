@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,8 +6,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { FileText, Download, Search, Filter, CalendarIcon, ChevronDown, BarChart } from "lucide-react";
 import { toast } from "sonner";
+import ReportRiskCategoriesChart from "@/components/reports/ReportRiskCategoriesChart";
+import ReportRiskTrendChart from "@/components/reports/ReportRiskTrendChart";
 
-// Detailed report data with analytics
 const reportData = [
   {
     id: "RPT-2023-001",
@@ -141,7 +141,7 @@ const Reports = () => {
   const [selectedReport, setSelectedReport] = useState<typeof reportData[0] | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
-  
+
   const filteredReports = reportData.filter(report => 
     report.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     report.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -154,14 +154,10 @@ const Reports = () => {
   };
 
   const handleExportReport = (report: typeof reportData[0], e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent opening the report when clicking export
-    
-    // In a real app, this would generate and download a PDF/Excel file
+    e.stopPropagation();
     toast.success(`Exporting "${report.title}"`, {
       description: "Your report will be downloaded shortly."
     });
-    
-    // Simulate export delay
     setTimeout(() => {
       toast.success(`Export complete for "${report.title}"`, {
         description: "Report has been downloaded successfully."
@@ -366,9 +362,8 @@ const Reports = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Report Details Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-4xl">
           {selectedReport && (
             <>
               <DialogHeader>
@@ -391,7 +386,6 @@ const Reports = () => {
               </DialogHeader>
 
               <div className="space-y-6">
-                {/* Report Summary */}
                 <div>
                   <h3 className="font-medium mb-2">Executive Summary</h3>
                   <p className="text-sm text-muted-foreground">
@@ -399,7 +393,6 @@ const Reports = () => {
                   </p>
                 </div>
 
-                {/* Top Risks */}
                 <div>
                   <h3 className="font-medium mb-3">Top Risks</h3>
                   <div className="space-y-3">
@@ -431,18 +424,37 @@ const Reports = () => {
                   </div>
                 </div>
 
-                {/* Charts Placeholder */}
                 <div className="space-y-4">
                   <h3 className="font-medium">Analytics</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {selectedReport.analytics.charts.map((chart, idx) => (
-                      <div key={idx} className="h-40 border rounded-md bg-muted/50 flex items-center justify-center">
-                        <div className="text-center">
-                          <BarChart className="h-8 w-8 mx-auto text-muted-foreground" />
-                          <p className="mt-2 text-sm text-muted-foreground">{chart.title} Chart</p>
-                        </div>
-                      </div>
-                    ))}
+                    {selectedReport.analytics.charts.map((chart, idx) => {
+                      if (chart.type === "bar") {
+                        return (
+                          <ReportRiskCategoriesChart 
+                            key={idx} 
+                            categories={selectedReport.analytics.topRisks}
+                          />
+                        );
+                      } else if (chart.type === "line") {
+                        return (
+                          <ReportRiskTrendChart 
+                            key={idx}
+                            chartType="line"
+                            chartTitle={chart.title}
+                          />
+                        );
+                      } else if (chart.type === "pie") {
+                        return (
+                          <div key={idx} className="h-[300px] border rounded-md bg-muted/50 flex items-center justify-center">
+                            <div className="text-center">
+                              <BarChart className="h-8 w-8 mx-auto text-muted-foreground" />
+                              <p className="mt-2 text-sm text-muted-foreground">{chart.title} Chart</p>
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })}
                   </div>
                 </div>
 
